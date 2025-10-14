@@ -1,6 +1,3 @@
-# Approximate 3 sections, front cone, middle tube, back cone.
-# Updated to include wall thickness via OUTER vs INNER geometry.
-
 import sympy as sp
 
 # ----------------------------
