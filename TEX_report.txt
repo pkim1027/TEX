@@ -1,0 +1,37 @@
+=== SECTION 1: VOLUME CALCULATIONS ===
+=== TEX_volume (using total ≈ 243 in) ===
+V_front_out  (ft^3): 3.86154
+V_tube_out   (ft^3): 47.6475
+V_back_out   (ft^3): 4.47411
+V_total_out  (ft^3): 55.9831
+
+V_front_in   (ft^3): 3.70232
+V_tube_in    (ft^3): 45.6829
+V_back_in    (ft^3): 4.25577
+V_total_in   (ft^3): 53.6410
+
+V_wall (ft^3): 2.34219
+
+
+=== SECTION 2: LONGITUDINAL CG & CB ===
+=== TEX_Long_CB_CG ===
+Motor edges (in): front = 121.0, back = 145.5
+Motor center (in): 133.25
+Shell centroid (in): 123.23485738958146
+Combined CG (in):   125.78256910626686
+CB approx (in):     121.04411827387368
+
+
+=== SECTION 3: DRAFT CALCULATIONS (570 lb) ===
+=== TEX_draft (W = 570 lbf, L = 182 in) ===
+Equivalent length L_eq (in): 213.840
+Draft for W=570 lbf (in):    5.28109
+CB vertical below WL (in):   8.87707
+
+
+=== SECTION 4: 12-INCH DRAFT CONDITION ===
+=== TEX_draft_12_inch (T = 12 in, L = 182 in) ===
+Total outer volume (ft^3): 55.9831
+Required weight (lbf):     1.75E+3
+CB vertical below WL (in): 5.09296
+
