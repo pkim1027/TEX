@@ -79,8 +79,6 @@ def draft_from_weight(W_lbf, T_guess_in=sp.Rational(12,1)):
 W = sp.Rational(570,1)
 T_570_in = draft_from_weight(W, T_guess_in=sp.Rational(6,1))
 
-print("Equivalent length L_eq (in):", sp.N(L_eq, 6))
-print("Total outer volume V_out (ft^3):", sp.N(V_out_in3/(12**3), 6))
 print("Draft for W=570 lbf (in):", T_570_in)
 
 # ---------------------------------

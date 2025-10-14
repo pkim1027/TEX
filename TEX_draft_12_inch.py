@@ -47,7 +47,6 @@ V_out_ft3 = sp.simplify(V_out_in3 / (12**3))
 gamma = sp.Rational(624,10)  # 62.4 lbf/ft^3
 W_T12 = sp.simplify(gamma * (sp.Rational(1,2) * V_out_ft3))
 
-print("Total outer volume (ft^3):", sp.N(V_out_ft3, 6))
 print("Required weight for draft T = 12 in (lbf):", sp.N(W_T12, 3))
 
 # (Optional) CB vertical below WL at T=12 in for a circle of radius 12 in:
