@@ -12,6 +12,7 @@ V_total_in   (ft^3): 53.6410
 
 V_wall (ft^3): 2.34219
 
+=== SECTIONS 2-4 IS WITHOUT CONSIDERING FREE-FLOODNG ===
 
 === SECTION 2: LONGITUDINAL CG & CB ===
 === TEX_Long_CB_CG ===
@@ -34,4 +35,53 @@ CB vertical below WL (in):   8.87707
 Total outer volume (ft^3): 55.9831
 Required weight (lbf):     1.75E+3
 CB vertical below WL (in): 5.09296
+
+=== SECTION 5: SEALED MOTOR SECTION BUOYANCY ===
+=== Target Draft: 12 inches ===
+R (in): 12.000, L_bay (ft): 4.000
+Draft at bay, d (in): 12.0000
+Buoyant area A (ft^2): 1.570796
+Volume V (ft^3):       6.283185
+Buoyancy B (lbf):      392.070763
+CB below WL (in):      5.0930
+
+=== Target Draft: 24 inches ===
+R (in): 12.000, L_bay (ft): 4.000
+Draft at bay, d (in): 24.0000
+Buoyant area A (ft^2): 3.141593
+Volume V (ft^3):       12.566371
+Buoyancy B (lbf):      784.141526
+CB below WL (in):      0.0000
+
+
+=== SECTION 6: FOAM BALL BUOYANCY AND CAPACITY ===
+=== Above-WL Ball Capacity ===
+Total weight (lbf):                     570.000
+Target outside draft (in):              12.000   (inside draft: 11.750 in)
+Ball Ø (in), mass (g), η:               1.500, 0.600, 0.600
+---- Hydro & Need
+Motor-bay buoyancy at target (lbf):     392.071
+Buoyancy shortfall ΔB (lbf):            177.929
+Balls to meet ΔB (count):               2848
+---- Volumes (ft^3)
+Interior BELOW WL (ft^3):               21.056
+Interior ABOVE WL (ft^3):               18.561   <-- jam region (cones + cyl minus motor bay)
+Foam solid volume (ft^3):               2.913
+Foam packed envelope (ft^3):            4.854
+Jam threshold (packed) (ft^3):          18.561
+---- Jam Evaluation
+Jam status:                             insufficient
+Deficit vs jam (ft^3):                  13.707
+Overfill vs jam (ft^3):                 0.000
+Extra balls needed to jam (count):      8043
+Balls to remove (within tol) (count):   0
+
+=== Max 1.5" Balls Capacity in Free-Flooding Sections ===
+Ball diameter (in):                 1.500
+Packing efficiency η:               0.600
+---- Volumes (ft^3)
+TOTAL free-flood interior:          39.618
+---- Capacity
+Single ball volume (ft^3):          0.001023
+Max balls (packed):                 23243
 
