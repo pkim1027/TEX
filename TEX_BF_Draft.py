@@ -63,7 +63,6 @@ def print_natural(R_in=12, L_bay_ft_num=4.0, d_in=12.0):
     A_ft2 = float(seg_area(d_ft_num, R_ft_num))
     V_ft3 = A_ft2 * L_bay_ft_num
     print("=== Buoyancy: Sealed Motor Bay Only ===")
-    print(f"R (in): {R_in:.3f}, L_bay (ft): {L_bay_ft_num:.3f}")
     print(f"Draft at bay, d (in): {d_in:.4f}")
     print(f"Buoyant area A (ft^2): {A_ft2:.6f}")
     print(f"Volume V (ft^3):       {V_ft3:.6f}")
@@ -77,7 +76,7 @@ def print_natural(R_in=12, L_bay_ft_num=4.0, d_in=12.0):
 if __name__ == "__main__":
     # Example geometry: 24 in OD (R=12 in), 4 ft sealed motor bay
     R_in_default = 12
-    L_bay_ft_default = 4.0
+    L_bay_ft_default = float(inch_to_ft(50))
 
     # Example drafts at the motor bay (inches from bottom)
     drafts_in = [12, 24]  # note: 24 in == 2R, full submergence

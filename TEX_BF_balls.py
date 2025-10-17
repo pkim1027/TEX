@@ -7,7 +7,7 @@ from dataclasses import dataclass
 @dataclass
 class Inputs:
     # Hydro target
-    W_total_lbf: float = 610.0        # total vessel weight (lbf)
+    W_total_lbf: float = 670.0        # total vessel weight (lbf)
     draft_in: float = 12.0            # target *outside* draft at motor bay (inches from outside bottom)
     gamma: float = 62.4               # lbf/ft^3 (fresh water)
 
@@ -242,10 +242,6 @@ def print_report(r: dict):
     print("=== Above-WL Capacity with Cones (Jam Check) ===")
     print(f"Total weight (lbf):                     {fmt(inp.W_total_lbf,3)}")
     print(f"Target outside draft (in):              {fmt(inp.draft_in,3)}   (inside draft: {fmt(r['d_inside_in'],3)} in)")
-    print(f"R_out (in) / t_wall (in):               {fmt(inp.R_out_in,3)} / {fmt(inp.t_wall_in,3)}")
-    print(f"Lengths (in): Front {fmt(inp.L_front_in,3)}, Cyl {fmt(inp.L_cyl_in,3)}, Back {fmt(inp.L_back_in,3)}")
-    print(f"Back tip cut R_out (in):                {fmt(inp.r_back_tip_out_in,3)}")
-    print(f"Motor bay in cylinder (front/back in):  {fmt(inp.motor_bay_front_in,3)} → {fmt(inp.motor_bay_back_in,3)}  (L_bay={fmt(r['L_bay_in'],3)} in)")
     print(f"Ball Ø (in), mass (g), η:               {fmt(inp.ball_d_in,3)}, {fmt(inp.ball_weight_g,3)}, {fmt(inp.eta_packing,3)}")
     print("---- Hydro & Need")
     print(f"Motor-bay buoyancy at target (lbf):     {fmt(r['B_bay_lbf'],3)}")
