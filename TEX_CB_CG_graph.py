@@ -353,7 +353,7 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, fully_submerged: 
 
 
 # ----------------------------
-# RUNS cccc
+# RUNS
 # ----------------------------
 if __name__ == "__main__":
     draw_cb(fully_submerged=True)
