@@ -171,7 +171,11 @@ def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Onl
 # ----------------------------
 if __name__ == "__main__":
     base = Inputs()
-    # Use a specified draft
+    base.solve_equilibrium = False
+    base.draft_in = 12.0
+    res = compute_cb_surface(base)
+    print_block(base, res, title="CB @ Given Draft (Motor Bay Only)")
+
     base.solve_equilibrium = False
     base.draft_in = 24.0
     res = compute_cb_surface(base)
@@ -179,6 +183,6 @@ if __name__ == "__main__":
 
     # Equilibrium draft for a total weight:
     base.solve_equilibrium = True
-    base.W_total_lbf = 670.0
+    base.W_total_lbf = 610.0
     res = compute_cb_surface(base)
     print_block(base, res, title="CB @ Solved Draft for W_total (Motor Bay Only)")

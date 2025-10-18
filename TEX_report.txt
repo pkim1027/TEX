@@ -69,41 +69,41 @@ Draft used (in): 24.000
   CB depth below WL (in):        16.000
   CB height above bottom (in):   8.000
 
-=== CB @ Solved Draft for W_total ===
+=== CB @ Solved Draft for W_total (Motor Bay Only) ===
 [Inputs]
-Equilibrium draft solved for W_total (lbf): 670.000
-Draft used (in): 18.346
+Equilibrium draft solved for W_total (lbf): 610.000
+Draft used (in): 16.782
 
 [Hydro @ Draft]
-  Submerged area A (in^2):       371.077
-  Submerged volume (ft^3):       10.737
-  Buoyant force B (lbf):         670.000
+  Submerged area A (in^2):       337.846
+  Submerged volume (ft^3):       9.776
+  Buoyant force B (lbf):         610.000
 
 [Center of Buoyancy]
   CB_x from nose (in):           125.000
-  CB depth below WL (in):        1.898
-  CB height above bottom (in):   16.449
+  CB depth below WL (in):        2.631
+  CB height above bottom (in):   14.151
 
 === SECTION 6: FOAM BALL BUOYANCY AND CAPACITY ===
-=== Above-WL Capacity ===
-Total weight (lbf):                     670.000
+=== Above-WL Capacity with Cones (Jam Check) ===
+Total weight (lbf):                     610.000
 Target outside draft (in):              12.000   (inside draft: 11.750 in)
 Ball Ø (in), mass (g), η:               1.500, 0.600, 0.600
 ---- Hydro & Need
 Motor-bay buoyancy at target (lbf):     392.071
-Buoyancy shortfall ΔB (lbf):            277.929
-Balls to meet ΔB (count):               4448
+Buoyancy shortfall ΔB (lbf):            217.929
+Balls to meet ΔB (count):               3488
 ---- Volumes (ft^3)
 Interior BELOW WL (ft^3):               21.056
 Interior ABOVE WL (ft^3):               18.561   <-- jam region (cones + cyl minus motor bay)
-Foam solid volume (ft^3):               4.549
-Foam packed envelope (ft^3):            7.581
+Foam solid volume (ft^3):               3.567
+Foam packed envelope (ft^3):            5.945
 Jam threshold (packed) (ft^3):          18.561
 ---- Jam Evaluation
 Jam status:                             insufficient
-Deficit vs jam (ft^3):                  10.980
+Deficit vs jam (ft^3):                  12.616
 Overfill vs jam (ft^3):                 0.000
-Extra balls needed to jam (count):      6443
+Extra balls needed to jam (count):      7403
 Balls to remove (within tol) (count):   0
 
 === Max 1.5" Balls Capacity in Free-Flooding Sections ===
