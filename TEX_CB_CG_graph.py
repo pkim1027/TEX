@@ -15,26 +15,39 @@ import matplotlib.pyplot as plt
 # ----------------------------
 # SEGMENT GEOMETRY (CIRCULAR SEGMENT)
 # ----------------------------
+EPS = 1e-9
+
 def seg_area_in2(d_in: float, R_in: float) -> float:
     """Submerged circular-segment area (in^2) for radius R_in (in), draft d_in (in) measured up from bottom."""
     d = max(0.0, min(d_in, 2.0 * R_in))
-    if d == 0.0:
+    if d <= EPS:
         return 0.0
-    if abs(d - 2.0 * R_in) < 1e-12:
+    if d >= 2.0 * R_in - EPS:
         return math.pi * R_in * R_in
-    return (R_in**2) * math.acos((R_in - d) / R_in) - (R_in - d) * math.sqrt(max(0.0, 2 * R_in * d - d * d))
+    u = (R_in - d) / max(EPS, R_in)            # may be slightly outside [-1,1]
+    u = max(-1.0, min(1.0, u))
+    A1 = (R_in**2) * math.acos(u)
+    rad = max(0.0, 2.0 * R_in * d - d * d)
+    A2 = (R_in - d) * math.sqrt(rad)
+    return A1 - A2
 
 def seg_theta(d_in: float, R_in: float) -> float:
-    return 2.0 * math.acos((R_in - d_in) / R_in) if R_in > 0 else 0.0
+    d = max(0.0, min(d_in, 2.0 * R_in))
+    if R_in <= 0.0:
+        return 0.0
+    u = (R_in - d) / R_in
+    u = max(-1.0, min(1.0, u))
+    return 2.0 * math.acos(u)
 
 def seg_centroid_below_WL_in(d_in: float, R_in: float) -> float:
     """Centroid depth (in) measured downward from WL to the segment centroid."""
-    if d_in <= 0:
+    d = max(0.0, min(d_in, 2.0 * R_in))
+    if d <= EPS:
         return 0.0
-    if d_in >= 2.0 * R_in:
-        return 4.0 * R_in / 3.0
-    theta = seg_theta(d_in, R_in)
-    denom = (theta - math.sin(theta))
+    if d >= 2.0 * R_in - EPS:
+        return R_in  # full circle: centroid is at center (R below WL)
+    theta = seg_theta(d, R_in)                 # safe theta
+    denom = theta - math.sin(theta)
     if abs(denom) < 1e-14:
         return 0.0
     return (4.0 * R_in * (math.sin(theta / 2.0) ** 3)) / (3.0 * denom)
@@ -62,6 +75,8 @@ class Inputs:
     # Optional solve for draft given total weight
     W_total_lbf: Optional[float] = None
     solve_equilibrium: bool = False
+    fully_submerged: bool = False   # keep this; remove the extra solve_equilibrium line
+
 
 # ----------------------------
 # CORE COMPUTATIONS (CB FOR SEALED MOTOR BAY)
@@ -100,27 +115,32 @@ def solve_draft_no_foam(W_lbf: float, R_out_in: float, L_bay_in: float, gamma: f
 
 def compute_cb_surface(inp: Inputs):
     # bay span along cylinder
-    s_front, s_back = bay_span_from_back_offset(inp.L_cyl_in, inp.back_offset_from_back_cone_in, inp.motor_bay_length_in)
+    s_front, s_back = bay_span_from_back_offset(
+        inp.L_cyl_in, inp.back_offset_from_back_cone_in, inp.motor_bay_length_in
+    )
     L_bay_in = max(0.0, s_back - s_front)
 
-    # draft selection / solve
-    draft_used_in = inp.draft_in
-    if inp.solve_equilibrium:
+    # --- choose the draft once (precedence: fully_submerged > solve_equilibrium > given) ---
+    if inp.fully_submerged:
+        draft_used_in = 2.0 * inp.R_out_in
+    elif inp.solve_equilibrium:
         if inp.W_total_lbf is None or inp.W_total_lbf <= 0:
             raise ValueError("Set W_total_lbf > 0 when solve_equilibrium=True.")
         draft_used_in = solve_draft_no_foam(inp.W_total_lbf, inp.R_out_in, L_bay_in, inp.gamma)
+    else:
+        draft_used_in = inp.draft_in
 
-    # hydro @ draft
+    # --- hydro @ chosen draft ---
     V_ft3 = displaced_volume_from_draft_ft3(inp.R_out_in, draft_used_in, L_bay_in)
     B_lbf = inp.gamma * V_ft3
 
     # longitudinal CB_x from nose: nose→front cone + bay midpoint in cylinder
     x_front_bay_from_nose = inp.L_front_in + s_front
-    x_back_bay_from_nose = inp.L_front_in + s_back
+    x_back_bay_from_nose  = inp.L_front_in + s_back
     CBx_in = 0.5 * (x_front_bay_from_nose + x_back_bay_from_nose)
 
-    # vertical CB via segment centroid below WL
-    ybar_in = seg_centroid_below_WL_in(draft_used_in, inp.R_out_in)  # depth below WL (in)
+    # vertical CB via circular-segment centroid (depth below WL positive)
+    ybar_in = seg_centroid_below_WL_in(draft_used_in, inp.R_out_in)
     z_CB_from_bottom_in = draft_used_in - ybar_in
     z_CB_below_WL_in = ybar_in
 
@@ -148,9 +168,11 @@ def fmt(x, nd=4):
 def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Only"):
     print(f"=== {title} ===")
     print("[Inputs]")
-    if inp.solve_equilibrium:
+    if inp.fully_submerged:
+        print("Mode: fully submerged (draft = 2R)")
+    elif inp.solve_equilibrium:
         print(f"Equilibrium draft solved for W_total (lbf): {fmt(inp.W_total_lbf,3)}")
-    print(f"Draft used (in): {fmt(r['draft_used_in'],3)} | gamma (lbf/ft^3): {fmt(inp.gamma,3)}")
+    print(f"Draft used (in): {fmt(r['draft_used_in'],3)}")
     print("")
     print("[Hydro @ Draft]")
     print(f"  Submerged area A (in^2):       {fmt(r['submerged_area_in2'],3)}")
@@ -162,6 +184,7 @@ def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Onl
     print(f"  CB depth below WL (in):        {fmt(r['z_CB_below_WL_in'],3)}")
     print(f"  CB height above bottom (in):   {fmt(r['z_CB_from_bottom_in'],3)}")
     print("")
+
 
 # ----------------------------
 # HULL PROFILE (FOR DRAWING)
@@ -246,34 +269,36 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
     x = np.linspace(0, p.x_back_end, 1200)
     r = np.array([r_hull(xi, p) for xi in x])
 
-    plt.figure(figsize=(11, 4))
+    plt.figure(figsize=(11, 4.8))
     plt.plot(x, r, color="#0052CC", lw=2.2, label="Outer Hull",
              solid_capstyle="round", solid_joinstyle="round")
     plt.plot(x, -r, color="#0052CC", lw=2.2,
              solid_capstyle="round", solid_joinstyle="round")
 
-    # section markers
+    # --- Section markers ---
     r_front_join = r_hull(p.x_front_end, p)
     r_back_join = r_hull(p.x_cyl_end, p)
     r_stern = r_hull(p.x_back_end, p)
     plt.vlines(p.x_front_end, -r_front_join, r_front_join, linestyle='--', color="#666666")
     plt.vlines(p.x_cyl_end, -r_back_join, r_back_join, linestyle='--', color="#666666")
-    stern = plt.vlines(p.x_back_end, -r_stern, r_stern, lw=2.2, color="#0052CC")
-    stern.set_capstyle('round')
+    plt.vlines(p.x_back_end, -r_stern, r_stern, lw=2.2, color="#0052CC")
 
-    # waterline (y=0)
-    plt.axhline(0, linestyle='--', color='#AAAAAA', lw=1.0, label="Waterline")
+    # --- Waterline height and CB ---
+    d_used = r_cb["draft_used_in"]
+    y_wl = d_used - p.R               # height of WL above hull centerline
+    plt.axhline(y_wl, linestyle='--', color='#888888', lw=1.1, label="Waterline")
 
-    # center of buoyancy marker
     x_cb = r_cb["CBx_in"]
-    y_cb = -r_cb["z_CB_below_WL_in"]  # below WL is negative
-    plt.scatter([x_cb], [y_cb], s=60, color="#d62728", zorder=5, label=f'CB ({inp.draft_in:.3g}" draft)')
-    plt.annotate(f'CB ({inp.draft_in:.3g}")', xy=(x_cb, y_cb), xytext=(x_cb + 10, y_cb - 2),
+    y_cb = y_wl - r_cb["z_CB_below_WL_in"]
+    plt.scatter([x_cb], [y_cb], s=70, color="#d62728", zorder=5, label=f'CB ({d_used:.3g}" draft)')
+    plt.annotate(f'CB ({d_used:.3g}")',
+                 xy=(x_cb, y_cb),
+                 xytext=(x_cb + 10, y_cb - 2),
                  arrowprops=dict(arrowstyle='->', lw=1.2, color="#d62728"),
                  fontsize=10, color="#d62728", ha='left', va='center')
 
-    # x-axis section labels (boxed)
-    y_label_offset = -1.4 * p.R
+    # --- Section labels ---
+    y_label_offset = -1.55 * p.R
     plt.text(p.Lf / 2, y_label_offset, "Front Cone",
              ha='center', va='top', fontsize=10, fontweight='bold', color="#1f77b4",
              bbox=dict(facecolor='white', edgecolor='#1f77b4', boxstyle='round,pad=0.3', lw=1.0))
@@ -284,7 +309,13 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
              ha='center', va='top', fontsize=10, fontweight='bold', color="#d62728",
              bbox=dict(facecolor='white', edgecolor='#d62728', boxstyle='round,pad=0.3', lw=1.0))
 
-    plt.gca().set_aspect('equal', 'box')
+    # --- Symmetric view with margin (so WL is visibly above hull) ---
+    ax = plt.gca()
+    margin = 0.25 * p.R
+    ax.set_ylim(-(p.R + margin), +(p.R + margin))
+    ax.set_aspect('equal', 'box')
+
+    # --- Labels and legend ---
     plt.xlabel('x [in] (nose → stern)', labelpad=15)
     plt.ylabel('r [in]')
     plt.title(title)
@@ -296,32 +327,33 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
 # ----------------------------
 # ONE-CALL HELPER
 # ----------------------------
-def draw_cb_for(draft_in: float = None, W_total_lbf: float = None):
-    """
-    If W_total_lbf is provided, solve for draft and draw.
-    Otherwise, use the provided draft_in directly.
-    """
+def draw_cb(draft_in: float = None, W_total_lbf: float = None, fully_submerged: bool = False):
     inp = Inputs()
-    if W_total_lbf is not None:
+    inp.fully_submerged = bool(fully_submerged)
+    if inp.fully_submerged:
+        inp.solve_equilibrium = False  # ignore solver when submerged
+    elif W_total_lbf is not None:
         inp.solve_equilibrium = True
         inp.W_total_lbf = float(W_total_lbf)
     else:
         if draft_in is None:
-            raise ValueError("Provide either draft_in or W_total_lbf.")
+            raise ValueError("Provide draft_in, W_total_lbf, or set fully_submerged=True.")
         inp.solve_equilibrium = False
         inp.draft_in = float(draft_in)
 
     result = compute_cb_surface(inp)
-    inp.draft_in = result["draft_used_in"]  # sync used draft for labeling
-    title = "TEX Hull Profile — CB (Solved Draft)" if inp.solve_equilibrium else "TEX Hull Profile — CB @ Given Draft"
+    inp.draft_in = result["draft_used_in"]
+    title = "TEX Hull Profile — CB (Fully Submerged)" if inp.fully_submerged \
+            else ("TEX Hull Profile — CB (Solved Draft)" if inp.solve_equilibrium
+                  else "TEX Hull Profile — CB @ Given Draft")
     plot_hull_with_cb(inp, result, title=title)
-    print_block(inp, result, title=("CB @ Solved Draft (Motor Bay Only)" if inp.solve_equilibrium else "CB @ Given Draft (Motor Bay Only)"))
+    print_block(inp, result, title=("CB @ Fully Submerged (Motor Bay Only)" if inp.fully_submerged
+                                    else "CB @ Solved Draft (Motor Bay Only)" if inp.solve_equilibrium
+                                    else "CB @ Given Draft (Motor Bay Only)"))
+
 
 # ----------------------------
 # RUNS
 # ----------------------------
 if __name__ == "__main__":
-    # Example 1: draw at a given draft (inches)
-    draw_cb_for(draft_in=12.0)
-
-    draw_cb_for(W_total_lbf=650.0)
+    draw_cb(fully_submerged=True)
