@@ -57,10 +57,22 @@ CB below WL (in):      0.0000
 
 === CB @ Given Draft ===
 [Inputs]
+Draft used (in): 12.000
+
+[Hydro @ Draft]
+  Submerged volume (ft^3):       6.545
+  Buoyant force B (lbf):         408.407
+
+[Center of Buoyancy]
+  CB_x from nose (in):           125.000
+  CB depth below WL (in):        5.093
+  CB height above bottom (in):   6.907
+
+=== CB @ Given Draft ===
+[Inputs]
 Draft used (in): 24.000
 
 [Hydro @ Draft]
-  Submerged area A (in^2):       452.389
   Submerged volume (ft^3):       13.090
   Buoyant force B (lbf):         816.814
 
@@ -69,20 +81,19 @@ Draft used (in): 24.000
   CB depth below WL (in):        16.000
   CB height above bottom (in):   8.000
 
-=== CB @ Solved Draft for W_total (Motor Bay Only) ===
+=== CB @ Solved Draft for Weight ===
 [Inputs]
-Equilibrium draft solved for W_total (lbf): 610.000
-Draft used (in): 16.782
+Equilibrium draft solved for W_total (lbf): 650.000
+Draft used (in): 17.811
 
 [Hydro @ Draft]
-  Submerged area A (in^2):       337.846
-  Submerged volume (ft^3):       9.776
-  Buoyant force B (lbf):         610.000
+  Submerged volume (ft^3):       10.417
+  Buoyant force B (lbf):         650.000
 
 [Center of Buoyancy]
   CB_x from nose (in):           125.000
-  CB depth below WL (in):        2.631
-  CB height above bottom (in):   14.151
+  CB depth below WL (in):        2.143
+  CB height above bottom (in):   15.668
 
 === SECTION 6: FOAM BALL BUOYANCY AND CAPACITY ===
 === Above-WL Capacity with Cones (Jam Check) ===

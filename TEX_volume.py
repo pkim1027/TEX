@@ -9,6 +9,8 @@ R_in = R_out - t_wall            # inner radius [in]
 
 lf = 29.5                        # front cone length [in]
 lb = 31.5                        # back cone nominal length [in]
+lb_to_cylin = 7
+lf_to_cylin = 5
 # Use total ≈ 243 in -> straight tube length:
 L_total = 243
 L = sp.Rational(L_total, 1) - (sp.Rational(lf,1) + sp.Rational(lb,1))  # => 182 in
