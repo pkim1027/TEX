@@ -272,9 +272,6 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
     stern = plt.vlines(p.x_back_end, -r_stern, r_stern, lw=2.2, color="#0052CC")
     stern.set_capstyle('round')
 
-    # Waterline
-    d_used = r_cb["draft_used_in"]
-
     # Define waterline elevation relative to keel (bottom)
     y_wl = -p.R + (2.0 * p.R + 2 if inp.submerged else r_cb["draft_used_in"])
 
@@ -285,6 +282,11 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
         y_text = y_wl - 3   # place label below WL when submerged
         x_label = x_label-5
         va = 'top'
+    if inp.solve_equilibrium:
+        label_text = "Waterline"
+        y_text = y_wl + 0.8
+        x_label = x_label+5
+        va = 'bottom'
     else:
         label_text = f'Waterline ({r_cb["draft_used_in"]:.1f}" draft)'
         y_text = y_wl + 0.8   # place label above WL otherwise
@@ -300,10 +302,20 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
     cb_from_keel = r_cb["z_CB_from_bottom_in"]
     cb_from_nose = r_cb["CBx_in"]
     
-    plt.scatter([x_cb], [y_cb], s=70, color="#d62728", zorder=5,
+    if not inp.solve_equilibrium:
+        plt.scatter([x_cb], [y_cb], s=70, color="#d62728", zorder=5,
             label=f'CB Vertical = {cb_from_keel:.2f}" above keel')
-    
-    plt.plot([], [], ' ', label=f'CB Longitudinal = {cb_from_nose:.1f}" from nose')
+        plt.plot([], [], ' ', label=f'CB Longitudinal = {cb_from_nose:.1f}" from nose')
+    else:
+    # Draw a vertical draft line from keel to waterline at mid-cylinder
+        x_draft = p.x_cyl_end - p.Lc / 2
+        y0 = -p.R
+        y1 = y_wl
+        plt.vlines(x_draft, y0, y1, color="#d62728", lw=2.2, linestyle=":")
+        # Place numeric label slightly above the line
+        plt.text(x_draft, y1 + 0.8, f'{r_cb["draft_used_in"]:.1f}" draft',
+             ha='center', va='bottom', color="#d62728", fontsize=10,
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8, pad=0.3))
 
     if inp.solve_equilibrium and inp.W_total_lbf:
         plt.plot([], [], ' ', label=f'Weight = {inp.W_total_lbf:.0f} lbf')
@@ -360,8 +372,8 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool =
     # sync used draft back to inputs for labeling
     inp.draft_in = r["draft_used_in"]
 
-    title = ("TEX Hull Profile — CB (Fully Submerged)" if inp.submerged else
-             "TEX Hull Profile — CB @ Given Weight" if inp.solve_equilibrium
+    title = ("TEX Hull Profile — CB (Submerged)" if inp.submerged else
+             "TEX Hull Profile — Waterline Given Weight" if inp.solve_equilibrium
              else "TEX Hull Profile — CB @ Given Draft")
 
     plot_hull_with_cb(inp, r, title=title)
@@ -373,4 +385,4 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool =
 # RUNS
 # ----------------------------
 if __name__ == "__main__":
-    draw_cb(submerged=True)
+    draw_cb(draft_in=14)

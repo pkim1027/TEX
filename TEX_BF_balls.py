@@ -7,8 +7,8 @@ from dataclasses import dataclass
 @dataclass
 class Inputs:
     # Hydro target
-    W_total_lbf: float = 650.0        # total vessel weight (lbf)
-    draft_in: float = 12.0            # target *outside* draft at motor bay (inches from outside bottom)
+    W_total_lbf: float = 1005       # total vessel weight (lbf)
+    draft_in: float = 14.0            # target *outside* draft at motor bay (inches from outside bottom)
     gamma: float = 62.4               # lbf/ft^3 (fresh water)
 
     # Global geometry
@@ -33,7 +33,7 @@ class Inputs:
     eta_packing: float = 0.60         # packing efficiency of spheres
 
     # Integration resolution
-    N_slices: int = 3000              # longitudinal slices for cones+cyl (flood region)
+    N_slices: int = 20000              # longitudinal slices for cones+cyl (flood region)
 
     # Overfill tolerance (% of above-WL capacity)
     overfill_tolerance_pct: float = 10.0

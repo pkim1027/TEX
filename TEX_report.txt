@@ -1,16 +1,14 @@
 === SECTION 1: VOLUME CALCULATIONS ===
-=== TEX_volume (using total ≈ 243 in) ===
-V_front_out  (ft^3): 3.86154
-V_tube_out   (ft^3): 47.6475
-V_back_out   (ft^3): 4.47411
-V_total_out  (ft^3): 55.9831
 
-V_front_in   (ft^3): 3.70232
-V_tube_in    (ft^3): 45.6829
-V_back_in    (ft^3): 4.25577
-V_total_in   (ft^3): 53.6410
+-- TOTAL HULL --
+Outer  V_out : 99793.174823 in³ = 57.7507 ft³
+Inner  V_in  : 95537.950382 in³ = 55.2882 ft³
+Material V_w : 4255.224441 in³ = 2.4625 ft³
 
-V_wall (ft^3): 2.34219
+-- MOTOR SECTION --
+Outer  V_out : 22619.467106 in³ = 13.0900 ft³
+Inner  V_in  : 21686.806787 in³ = 12.5502 ft³
+Material V_w : 932.660319 in³ = 0.5397 ft³
 
 
 === SECTIONS 2-4 IS WITHOUT CONSIDERING FREE-FLOODNG ===
