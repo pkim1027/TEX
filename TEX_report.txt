@@ -41,45 +41,6 @@ CB vertical below WL (in): 5.09296
 === CONSIDERING FREE-FLOODING ===
 
 === SECTION 5: SEALED MOTOR SECTION BUOYANCY ===
-=== Target Draft: 12 Inches ===
-Draft at bay, d (in): 12.0000
-Buoyant area A (ft^2): 1.570796
-Volume V (ft^3):       6.544985
-Buoyancy B (lbf):      408.407045
-CB below WL (in):      5.0930
-
-=== Target Draft: 24 Inches ===
-Draft at bay, d (in): 24.0000
-Buoyant area A (ft^2): 3.141593
-Volume V (ft^3):       13.089969
-Buoyancy B (lbf):      816.814090
-CB below WL (in):      0.0000
-
-=== CB @ Given Draft ===
-[Inputs]
-Draft used (in): 12.000
-
-[Hydro @ Draft]
-  Submerged volume (ft^3):       6.545
-  Buoyant force B (lbf):         408.407
-
-[Center of Buoyancy]
-  CB_x from nose (in):           125.000
-  CB depth below WL (in):        5.093
-  CB height above bottom (in):   6.907
-
-=== CB @ Given Draft ===
-[Inputs]
-Draft used (in): 24.000
-
-[Hydro @ Draft]
-  Submerged volume (ft^3):       13.090
-  Buoyant force B (lbf):         816.814
-
-[Center of Buoyancy]
-  CB_x from nose (in):           125.000
-  CB depth below WL (in):        16.000
-  CB height above bottom (in):   8.000
 
 === CB @ Solved Draft for Weight ===
 [Inputs]
@@ -95,26 +56,55 @@ Draft used (in): 17.811
   CB depth below WL (in):        2.143
   CB height above bottom (in):   15.668
 
+=== CB @ Given Draft ===
+[Inputs]
+Draft used (in): 12.000
+
+[Hydro @ Draft]
+  Submerged area A (in^2):       226.195
+  Submerged volume (ft^3):       6.545
+  Buoyant force B (lbf):         408.407
+
+[Center of Buoyancy]
+  CB_x from nose (in):           125.000
+  CB depth below WL (in):        5.093
+  CB height above bottom (in):   6.907
+
+=== CB @ Submerged ===
+[Inputs]
+Draft used (in): 24.000
+
+[Hydro @ Draft]
+  Submerged area A (in^2):       452.389
+  Submerged volume (ft^3):       13.090
+  Buoyant force B (lbf):         816.814
+
+[Center of Buoyancy]
+  CB_x from nose (in):           125.000
+  CB depth below WL (in):        12.000
+  CB height above bottom (in):   12.000
+
+
 === SECTION 6: FOAM BALL BUOYANCY AND CAPACITY ===
-=== Above-WL Capacity with Cones (Jam Check) ===
-Total weight (lbf):                     610.000
+=== Above-WL Capacity (Jam Check) ===
+Total weight (lbf):                     650.000
 Target outside draft (in):              12.000   (inside draft: 11.750 in)
 Ball Ø (in), mass (g), η:               1.500, 0.600, 0.600
 ---- Hydro & Need
-Motor-bay buoyancy at target (lbf):     392.071
-Buoyancy shortfall ΔB (lbf):            217.929
-Balls to meet ΔB (count):               3488
+Motor-bay buoyancy at target (lbf):     408.407
+Buoyancy shortfall ΔB (lbf):            241.593
+Balls to meet ΔB (count):               3867
 ---- Volumes (ft^3)
-Interior BELOW WL (ft^3):               21.056
-Interior ABOVE WL (ft^3):               18.561   <-- jam region (cones + cyl minus motor bay)
-Foam solid volume (ft^3):               3.567
-Foam packed envelope (ft^3):            5.945
-Jam threshold (packed) (ft^3):          18.561
+Interior BELOW WL (ft^3):               20.805
+Interior ABOVE WL (ft^3):               18.310   <-- jam region (cones + cyl minus motor bay)
+Foam solid volume (ft^3):               3.955
+Foam packed envelope (ft^3):            6.591
+Jam threshold (packed) (ft^3):          18.310
 ---- Jam Evaluation
 Jam status:                             insufficient
-Deficit vs jam (ft^3):                  12.616
+Deficit vs jam (ft^3):                  11.719
 Overfill vs jam (ft^3):                 0.000
-Extra balls needed to jam (count):      7403
+Extra balls needed to jam (count):      6876
 Balls to remove (within tol) (count):   0
 
 === Max 1.5" Balls Capacity in Free-Flooding Sections ===

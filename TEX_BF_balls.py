@@ -25,7 +25,7 @@ class Inputs:
 
     # Sealed motor bay inside the *cylinder* (inches from cylinder start)
     motor_bay_front_in: float = 40.0  # in from cylinder start
-    motor_bay_back_in: float  = 88.0  # in from cylinder start (front + ~48 in ~ 4 ft bay)
+    motor_bay_back_in: float  = 90.0  # in from cylinder start (front + ~48 in ~ 4 ft bay)
 
     # Foam balls
     ball_d_in: float = 1.5            # diameter (in)
