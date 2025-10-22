@@ -183,6 +183,6 @@ if __name__ == "__main__":
 
     # Equilibrium draft for a total weight:
     base.solve_equilibrium = True
-    base.W_total_lbf = 650.0
+    base.W_total_lbf = 1000.0
     res = compute_cb_surface(base)
     print_block(base, res, title="CB @ Solved Draft for W_total (Motor Bay Only)")

@@ -109,8 +109,9 @@ Balls to remove (within tol) (count):   0
 Ball diameter (in):                 1.500
 Packing efficiency η:               0.600
 ---- Volumes (ft^3)
-TOTAL free-flood interior:          39.618
+Total interior (all):               55.288
+Free-flood available:               43.240
 ---- Capacity
 Single ball volume (ft^3):          0.001023
-Max balls (packed):                 23243
+Max packed balls:                   25369
 
