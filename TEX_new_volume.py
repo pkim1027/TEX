@@ -1,11 +1,3 @@
-# -------------------------------------------------
-# TEX Hull — Volume Integration
-# -------------------------------------------------
-# - Front: parabolic √(x/Lf) with C¹ Hermite smoothing to cylinder
-# - Cylinder: constant radius
-# - Back: cosine-blended taper to truncated tip
-# -------------------------------------------------
-
 import math
 import numpy as np
 from dataclasses import dataclass
@@ -189,7 +181,7 @@ def print_volumes_with_motor(r: dict):
     print(f"Back cone  : outer {_fmt(r['Vb_out_ft3'],4)} / inner {_fmt(r['Vb_in_ft3'],4)}")
 
 # ----------------------------
-# Run
+# Output
 # ----------------------------
 if __name__ == "__main__":
     vin = VolInputs(

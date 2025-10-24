@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # ----------------------------
-# Geometry (inches)
+# Geometry
 # ----------------------------
 R_out = sp.Rational(12, 1)
 t_wall = sp.Rational(1, 4)
@@ -91,9 +91,6 @@ sbar_shell = sp.simplify(M_shell / V_shell)
 
 # ----------------------------
 # Motor CG from edges:
-# front edge from nose = 29.5 + 91.5 = 121.0
-# back edge from nose  = 29.5 + L - 66  (since "prop end of the tube to the back edge" = 66)
-# center = (front_edge + back_edge)/2
 # ----------------------------
 front_edge = lf + sp.Rational(183,2)           # 29.5 + 91.5 = 121.0
 back_edge  = lf + L - sp.Rational(66,1)        # 29.5 + 182 - 66 = 145.5

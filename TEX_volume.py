@@ -1,10 +1,10 @@
 import sympy as sp
 
 # ----------------------------
-# Given geometry (inches)
+# Geometry
 # ----------------------------
 R_out = 12                       # outer radius [in]
-t_wall = sp.Rational(1, 4)       # wall thickness = 1/4 in (exact rational)
+t_wall = sp.Rational(1, 4)       # wall thickness [in]
 R_in = R_out - t_wall            # inner radius [in]
 
 lf = 29.5                        # front cone length [in]
@@ -55,7 +55,7 @@ def back_cone_volume_with_cut(R_val, r_val, lb_val):
     return sp.simplify(Vb.subs({R_sym: R_val, r_sym: r_val, lb_sym: lb_val}))
 
 # ----------------------------
-# Compute OUTER volumes (what water "sees")
+# OUTER volumes
 # ----------------------------
 Vf_out = front_cone_volume(R_out, lf)                # in^3
 Vm_out = tube_volume(R_out, L)                       # in^3
@@ -65,7 +65,7 @@ V_total_out_in3 = sp.simplify(Vf_out + Vm_out + Vb_out)   # in^3
 V_total_out_ft3 = V_total_out_in3 / (12**3)               # ft^3
 
 # ----------------------------
-# Compute INNER volumes (floodable/fillable space)
+# INNER volumes
 # ----------------------------
 Vf_in = front_cone_volume(R_in, lf)                  # in^3
 Vm_in = tube_volume(R_in, L)                         # in^3
@@ -74,18 +74,15 @@ Vb_in = back_cone_volume_with_cut(R_in, r_tip_in, lb)     # in^3
 V_total_in_in3 = sp.simplify(Vf_in + Vm_in + Vb_in)       # in^3
 V_total_in_ft3 = V_total_in_in3 / (12**3)                 # ft^3
 
-# ----------------------------
-# Pretty rounding in your style: keep factor of pi where present
-# (Round the coefficient outside π to the nearest thousandth.)
-# ----------------------------
-def round_like_you(V_expr):
+
+def roundnum(V_expr):
     coeff_pi = sp.simplify(V_expr / sp.pi)
     if coeff_pi.has(sp.pi):
         return sp.nsimplify(sp.N(V_expr, 6))
     return sp.Rational(round(sp.N(coeff_pi, 10), 3)).limit_denominator() * sp.pi
 
-V_out_ft3_rounded = round_like_you(V_total_out_ft3)
-V_in_ft3_rounded  = round_like_you(V_total_in_ft3)
+V_out_ft3_rounded = roundnum(V_total_out_ft3)
+V_in_ft3_rounded  = roundnum(V_total_in_ft3)
 
 # ----------------------------
 # Print results

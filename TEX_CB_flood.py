@@ -1,19 +1,9 @@
-# ---------------------------------------------
-# TEX_CB_surface_motorbay.py
-# Center of Buoyancy (SURFACE MODE) for sealed motor bay only.
-# Free-flooding sections are neutral; no foam considered.
-#
-# NEW:
-#  - Explicit "submerged volume" of the sealed motor bay at the specified draft
-#  - Optional solver to find equilibrium draft for a given total weight W_total_lbf
-# ---------------------------------------------
-
 import math
 from dataclasses import dataclass
 from typing import Optional
 
 # ----------------------------
-# Segment geometry (circular segment)
+# Geometry
 # ----------------------------
 def seg_area_in2(d_in: float, R_in: float) -> float:
     """Submerged circular-segment area (in^2) for radius R_in (in), draft d_in (in) measured up from bottom."""
