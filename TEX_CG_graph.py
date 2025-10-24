@@ -112,9 +112,6 @@ def plot_hull_with_cg(cg_sys: CGSystem):
     r_stern = r_hull(x_stern, p)
     plt.vlines(x_stern, -r_stern, r_stern, color="#0052CC", lw=2.2)
 
-    # === Centerline ===
-    plt.axhline(y=0, color='gray', linestyle='--', lw=1.2, alpha=0.6)
-
     # CG point
     cg = cg_sys.cg()
     x_cg, z_cg = cg["x_in"], cg["z_in"]
@@ -127,7 +124,7 @@ def plot_hull_with_cg(cg_sys: CGSystem):
 
     plt.title("TEX — Center of Gravity", pad=10)
     plt.xlabel("x [in] (nose → stern)")
-    plt.ylabel("z [in] (above keel)")
+    plt.ylabel("z [in]")
     plt.gca().set_aspect('equal', 'box')
     plt.grid(True, alpha=0.3)
 
