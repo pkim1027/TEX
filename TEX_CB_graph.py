@@ -1,11 +1,3 @@
-# -------------------------------------------------
-# TEX Hull — Center of Buoyancy + Profile Plotter
-# -------------------------------------------------
-# - Computes center of buoyancy for the sealed motor bay section
-# - Accepts either a given draft OR solves draft from total weight
-# - Draws the hull profile, section markers, waterline, and CB point
-# -------------------------------------------------
-
 import math
 from dataclasses import dataclass
 from typing import Optional
@@ -13,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # ----------------------------
-# SEGMENT GEOMETRY (CIRCULAR SEGMENT)
+# Geometry
 # ----------------------------
 EPS = 1e-9
 
@@ -53,24 +45,23 @@ def seg_centroid_below_WL_in(d_in: float, R_in: float) -> float:
     return (4.0 * R_in * (math.sin(theta / 2.0) ** 3)) / (3.0 * denom)
 
 # ----------------------------
-# INPUTS (HYDRO + GEOMETRY)
+# Inputs
 # ----------------------------
 @dataclass
 class Inputs:
     # Hull (outer surface dims)
-    R_out_in: float = 12.0          # [in] outer radius (24" OD tube)
-    t_wall_in: float = 0.25         # [in] wall thickness (info; not used in surface-mode buoyancy)
+    R_out_in: float = 12.0          # [in] outer radius
     L_front_in: float = 29.5        # [in] front cone length
     L_cyl_in: float = 182.0         # [in] straight cylinder length
     L_back_in: float = 31.5         # [in] back cone length
 
     # Hydro
-    draft_in: float = 12.0          # [in] outside draft at motor-bay section
+    draft_in: float = 12.0          # [in] outside draft at motor section
     gamma: float = 62.4             # [lbf/ft^3] water weight density (fresh)
 
-    # Motor bay placement (along the straight cylinder)
-    back_offset_from_back_cone_in: float = 61.5  # [in] distance from start of back cone to bay BACK
-    motor_bay_length_in: float = 50.0            # [in] sealed bay length
+    # Motor compartment placement
+    back_offset_from_back_cone_in: float = 61.5  # [in] distance from start of back cone to motor back
+    motor_com_length_in: float = 50.0            # [in] sealed compartment length
 
     # Modes / solving
     W_total_lbf: Optional[float] = None          # target total weight (for solve mode)
@@ -78,45 +69,45 @@ class Inputs:
     submerged: bool = False                # if True, force draft = 2 * R_out_in
 
 # ----------------------------
-# CORE COMPUTATIONS (CB FOR SEALED MOTOR BAY)
+# Core Computations
 # ----------------------------
-def bay_span_from_back_offset(L_cyl_in: float, back_offset_in: float, bay_len_in: float):
+def com_span_from_back_offset(L_cyl_in: float, back_offset_in: float, com_len_in: float):
     """Return (s_front, s_back) in cylinder coordinates [0, L_cyl]."""
     s_back = max(0.0, min(L_cyl_in, L_cyl_in - back_offset_in))
-    s_front = max(0.0, min(L_cyl_in, s_back - bay_len_in))
+    s_front = max(0.0, min(L_cyl_in, s_back - com_len_in))
     if s_front > s_back:
         s_front, s_back = s_back, s_front
     return s_front, s_back
 
-def displaced_volume_from_draft_ft3(R_out_in: float, draft_in: float, L_bay_in: float) -> float:
-    """Submerged volume (ft^3) of the sealed bay at the given draft."""
+def displaced_volume_from_draft_ft3(R_out_in: float, draft_in: float, L_com_in: float) -> float:
+    """Submerged volume (ft^3) of the sealed compartment at the given draft."""
     A_in2 = seg_area_in2(draft_in, R_out_in)
-    V_in3 = A_in2 * max(0.0, L_bay_in)
+    V_in3 = A_in2 * max(0.0, L_com_in)
     return V_in3 / 1728.0
 
-def buoyancy_lbf_from_draft(R_out_in: float, draft_in: float, L_bay_in: float, gamma: float) -> float:
-    return gamma * displaced_volume_from_draft_ft3(R_out_in, draft_in, L_bay_in)
+def buoyancy_lbf_from_draft(R_out_in: float, draft_in: float, L_com_in: float, gamma: float) -> float:
+    return gamma * displaced_volume_from_draft_ft3(R_out_in, draft_in, L_com_in)
 
-def solve_draft_no_foam(W_lbf: float, R_out_in: float, L_bay_in: float, gamma: float,
+def solve_draft_no_foam(W_lbf: float, R_out_in: float, L_com_in: float, gamma: float,
                         d_lo_in: float = 0.0, d_hi_in: float = None, iters: int = 60) -> float:
-    """Solve draft d such that buoyancy equals W_lbf for the sealed bay only (bisection in [0, 2R])."""
+    """Solve draft d such that buoyancy equals W_lbf for the sealed compartment only (bisection in [0, 2R])."""
     if d_hi_in is None:
         d_hi_in = 2.0 * R_out_in
     lo, hi = d_lo_in, d_hi_in
     for _ in range(iters):
         mid = 0.5 * (lo + hi)
-        if buoyancy_lbf_from_draft(R_out_in, mid, L_bay_in, gamma) < W_lbf:
+        if buoyancy_lbf_from_draft(R_out_in, mid, L_com_in, gamma) < W_lbf:
             lo = mid
         else:
             hi = mid
     return 0.5 * (lo + hi)
 
 def compute_cb_surface(inp: Inputs):
-    # bay span along cylinder
-    s_front, s_back = bay_span_from_back_offset(
-        inp.L_cyl_in, inp.back_offset_from_back_cone_in, inp.motor_bay_length_in
+    # compartment span along cylinder
+    s_front, s_back = com_span_from_back_offset(
+        inp.L_cyl_in, inp.back_offset_from_back_cone_in, inp.motor_com_length_in
     )
-    L_bay_in = max(0.0, s_back - s_front)
+    L_com_in = max(0.0, s_back - s_front)
 
     # choose the draft once (precedence: submerged > solve_equilibrium > given)
     if inp.submerged:
@@ -124,18 +115,18 @@ def compute_cb_surface(inp: Inputs):
     elif inp.solve_equilibrium:
         if inp.W_total_lbf is None or inp.W_total_lbf <= 0:
             raise ValueError("Set W_total_lbf > 0 when solve_equilibrium=True.")
-        draft_used_in = solve_draft_no_foam(inp.W_total_lbf, inp.R_out_in, L_bay_in, inp.gamma)
+        draft_used_in = solve_draft_no_foam(inp.W_total_lbf, inp.R_out_in, L_com_in, inp.gamma)
     else:
         draft_used_in = inp.draft_in
 
     # hydro @ chosen draft
-    V_ft3 = displaced_volume_from_draft_ft3(inp.R_out_in, draft_used_in, L_bay_in)
+    V_ft3 = displaced_volume_from_draft_ft3(inp.R_out_in, draft_used_in, L_com_in)
     B_lbf = inp.gamma * V_ft3
 
-    # longitudinal CB (midpoint of sealed bay along cylinder, measured from nose)
-    x_front_bay_from_nose = inp.L_front_in + s_front
-    x_back_bay_from_nose = inp.L_front_in + s_back
-    CBx_in = 0.5 * (x_front_bay_from_nose + x_back_bay_from_nose)
+    # longitudinal CB (midpoint of sealed compartment  along cylinder, measured from nose)
+    x_front_com_from_nose = inp.L_front_in + s_front
+    x_back_com_from_nose = inp.L_front_in + s_back
+    CBx_in = 0.5 * (x_front_com_from_nose + x_back_com_from_nose)
 
     # vertical CB via circular-segment centroid (depth below WL positive)
     ybar_in = seg_centroid_below_WL_in(draft_used_in, inp.R_out_in)
@@ -144,7 +135,7 @@ def compute_cb_surface(inp: Inputs):
 
     return {
         "draft_used_in": draft_used_in,
-        "L_bay_in": L_bay_in,
+        "L_com_in": L_com_in,
         "submerged_area_in2": seg_area_in2(draft_used_in, inp.R_out_in),
         "submerged_volume_ft3": V_ft3,
         "buoyant_force_lbf": B_lbf,
@@ -156,14 +147,14 @@ def compute_cb_surface(inp: Inputs):
     }
 
 # ----------------------------
-# PRETTY PRINT
+# Pretty print
 # ----------------------------
 def fmt(x, nd=4):
     if isinstance(x, int):
         return str(x)
     return f"{x:.{nd}f}"
 
-def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Only"):
+def print_block(inp: Inputs, r: dict, title="Center of Buoyancy"):
     print(f"=== {title} ===")
     print("[Inputs]")
     if inp.submerged:
@@ -185,7 +176,7 @@ def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Onl
 
 
 # ----------------------------
-# HULL PROFILE (FOR DRAWING)
+# Hull Profile
 # ----------------------------
 @dataclass(frozen=True)
 class HullDims:
@@ -250,7 +241,7 @@ def waterline_y(draft_in: float, R: float) -> float:
     return -R + draft_in
 
 # ----------------------------
-# PLOTTER
+# Plotter
 # ----------------------------
 def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
     p = HullDims(R=inp.R_out_in, Lf=inp.L_front_in, Lc=inp.L_cyl_in, Lb=inp.L_back_in)
@@ -347,7 +338,7 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
 
 
 # ----------------------------
-# ONE-CALL HELPER
+# Helper
 # ----------------------------
 def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool = False):
     """
@@ -372,17 +363,18 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool =
     # sync used draft back to inputs for labeling
     inp.draft_in = r["draft_used_in"]
 
-    title = ("TEX Hull Profile — CB (Submerged)" if inp.submerged else
-             "TEX Hull Profile — Waterline Given Weight" if inp.solve_equilibrium
-             else "TEX Hull Profile — CB @ Given Draft")
+    title = ("TEX — Center of Buoyancy (Submerged)" if inp.submerged else
+             "TEX — CB @ Waterline Given Weight" if inp.solve_equilibrium
+             else "TEX — CB @ Given Draft")
 
     plot_hull_with_cb(inp, r, title=title)
-    print_block(inp, r, title=("CB @ Fully Submerged (Motor Bay Only)" if inp.submerged
-                               else "CB @ Solved Draft (Motor Bay Only)" if inp.solve_equilibrium
-                               else "CB @ Given Draft (Motor Bay Only)"))
+    print_block(inp, r, title=("CB @ Fully Submerged" if inp.submerged
+                               else "CB @ Solved Draft" if inp.solve_equilibrium
+                               else "CB @ Given Draft"))
 
 # ----------------------------
-# RUNS
+# Output
 # ----------------------------
 if __name__ == "__main__":
-    draw_cb(W_total_lbf=1000)
+    draw_cb(draft_in=12)
+    draw_cb(submerged=True)

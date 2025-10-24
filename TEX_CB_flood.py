@@ -45,8 +45,7 @@ def seg_centroid_below_WL_in(d_in: float, R_in: float) -> float:
 @dataclass
 class Inputs:
     # Hull
-    R_out_in: float = 12.0       # outer radius (in) for a 24" OD tube
-    t_wall_in: float = 0.25      # wall thickness (info only; not needed for surface-mode buoyancy)
+    R_out_in: float = 12.0       # outer radius (in)
     L_front_in: float = 29.5     # front cone length (in)
     L_cyl_in: float = 182.0      # straight cylinder length (in)
     L_back_in: float = 31.5      # back cone length (in)
@@ -59,7 +58,7 @@ class Inputs:
     back_offset_from_back_cone_in: float = 61.5  # distance from start of back cone to bay BACK (in)
     motor_bay_length_in: float = 50.0            # sealed length (in)
 
-    # Optional: use this (with solve_equilibrium=True) to compute the no-foam draft for total weight
+    # Compute the no-foam draft for total weight
     W_total_lbf: Optional[float] = None
     solve_equilibrium: bool = False              # if True, solve for draft such that B(d)=W_total_lbf
 
@@ -117,7 +116,7 @@ def compute_cb_surface(inp: Inputs):
     V_ft3 = displaced_volume_from_draft_ft3(inp.R_out_in, draft_used_in, L_bay_in)  # <-- submerged volume
     B_lbf = inp.gamma * V_ft3
 
-    # Longitudinal CB_x from nose: nose→front cone + bay midpoint in cylinder
+    # Longitudinal CB_x from nose: nose to front cone + bay midpoint in cylinder
     x_front_bay_from_nose = inp.L_front_in + s_front
     x_back_bay_from_nose  = inp.L_front_in + s_back
     CBx_in = 0.5 * (x_front_bay_from_nose + x_back_bay_from_nose)
@@ -131,7 +130,7 @@ def compute_cb_surface(inp: Inputs):
         "draft_used_in": draft_used_in,
         "L_bay_in": L_bay_in,
         "submerged_area_in2": seg_area_in2(draft_used_in, inp.R_out_in),
-        "submerged_volume_ft3": V_ft3,       # <-- explicit
+        "submerged_volume_ft3": V_ft3,
         "buoyant_force_lbf": B_lbf,
         "CBx_in": CBx_in,
         "z_CB_from_bottom_in": z_CB_from_bottom_in,
@@ -148,7 +147,7 @@ def fmt(x, nd=4):
         return str(x)
     return f"{x:.{nd}f}"
 
-def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Only"):
+def print_block(inp: Inputs, r: dict, title="Center of Buoyancy"):
     print(f"=== {title} ===")
     print("[Inputs]")
     if inp.solve_equilibrium:
@@ -167,22 +166,17 @@ def print_block(inp: Inputs, r: dict, title="CB (Surface Mode) — Motor Bay Onl
     print("")
 
 # ----------------------------
-# Default Run
+# Output
 # ----------------------------
 if __name__ == "__main__":
     base = Inputs()
     base.solve_equilibrium = False
     base.draft_in = 12.0
     res = compute_cb_surface(base)
-    print_block(base, res, title="CB @ Given Draft (Motor Bay Only)")
-
-    base.solve_equilibrium = False
-    base.draft_in = 24.0
-    res = compute_cb_surface(base)
-    print_block(base, res, title="CB @ Given Draft (Motor Bay Only)")
+    print_block(base, res, title="CB @ Given Draft")
 
     # Equilibrium draft for a total weight:
     base.solve_equilibrium = True
     base.W_total_lbf = 1000.0
     res = compute_cb_surface(base)
-    print_block(base, res, title="CB @ Solved Draft for W_total (Motor Bay Only)")
+    print_block(base, res, title="CB @ Solved Draft for Total Weight")

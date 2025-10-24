@@ -189,7 +189,7 @@ def print_volumes_with_motor(r: dict):
     print(f"Back cone  : outer {_fmt(r['Vb_out_ft3'],4)} / inner {_fmt(r['Vb_in_ft3'],4)}")
 
 # ----------------------------
-# Example run
+# Run
 # ----------------------------
 if __name__ == "__main__":
     vin = VolInputs(

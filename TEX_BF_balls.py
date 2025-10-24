@@ -7,12 +7,12 @@ from dataclasses import dataclass
 @dataclass
 class Inputs:
     # Hydro target
-    W_total_lbf: float = 1015      # total vessel weight (lbf)
-    draft_in: float = 12.0            # target *outside* draft at motor bay (inches from outside bottom)
+    W_total_lbf: float = 1000      # total vessel weight (lbf)
+    draft_in: float = 12.0            # target outside draft at motor bay (inches from outside bottom)
     gamma: float = 62.4               # lbf/ft^3 (fresh water)
 
     # Global geometry
-    R_out_in: float = 12.0            # outer radius (in) (24" OD -> 12")
+    R_out_in: float = 12.0            # outer radius (in)
     t_wall_in: float = 0.25           # wall thickness (in)
 
     # Section lengths (inches)
@@ -23,13 +23,13 @@ class Inputs:
     # Back cone cut (outer tip radius; set 0 if true tip)
     r_back_tip_out_in: float = 3.5    # in; inner tip becomes max(0, r_out - t_wall)
 
-    # Sealed motor bay inside the *cylinder* (inches from cylinder start)
+    # Sealed motor bay inside the cylinder
     motor_bay_front_in: float = 40.0  # in from cylinder start
-    motor_bay_back_in: float  = 90.0  # in from cylinder start (front + ~48 in ~ 4 ft bay)
+    motor_bay_back_in: float  = 90.0  # in from cylinder start
 
     # Foam balls
     ball_d_in: float = 1.5            # diameter (in)
-    ball_weight_g: float = 0.6        # grams (scale reading)
+    ball_weight_g: float = 0.6        # grams
     eta_packing: float = 0.60         # packing efficiency of spheres
 
     # Integration resolution
@@ -66,7 +66,6 @@ def bay_buoyancy_at_draft(R_out_in: float, draft_in: float, L_bay_in: float, gam
     return gamma * A * L_bay_ft, A
 
 def grams_to_lbf(g: float) -> float:
-    # Engineering convention near Earth: lbm ≈ lbf numerically on a scale.
     return g * 0.00220462
 
 def ball_properties(ball_d_in: float, ball_weight_g: float, gamma: float):
@@ -196,7 +195,7 @@ def compute_with_cones(inp: Inputs):
     elif V_foam_packed > jam_threshold_ft3 * (1 + inp.overfill_tolerance_pct/100.0):
         jam_status = "overfill_excess"
 
-    # Extra balls to *reach* jam threshold if insufficient
+    # Extra balls to reach jam threshold if insufficient
     n_more_to_jam = 0
     if jam_deficit_ft3 > 0 and V_ball > 0:
         n_more_to_jam = math.ceil((jam_deficit_ft3 * inp.eta_packing) / V_ball)
@@ -249,10 +248,8 @@ def print_report(r: dict):
     print(f"Balls to meet ΔB (count):               {r['n_balls_for_buoy']}")
     print("---- Volumes (ft^3)")
     print(f"Interior BELOW WL (ft^3):               {fmt(r['V_below_WL_ft3'],3)}")
-    print(f"Interior ABOVE WL (ft^3):               {fmt(r['V_above_WL_ft3'],3)}   <-- jam region (cones + cyl minus motor bay)")
-    print(f"Foam solid volume (ft^3):               {fmt(r['V_foam_solid_ft3'],3)}")
+    print(f"Interior ABOVE WL (ft^3):               {fmt(r['V_above_WL_ft3'],3)}")
     print(f"Foam packed envelope (ft^3):            {fmt(r['V_foam_packed_ft3'],3)}")
-    print(f"Jam threshold (packed) (ft^3):          {fmt(r['jam_threshold_ft3'],3)}")
     print("---- Jam Evaluation")
     print(f"Jam status:                             {r['jam_status']}")
     print(f"Deficit vs jam (ft^3):                  {fmt(r['jam_deficit_ft3'],3)}")

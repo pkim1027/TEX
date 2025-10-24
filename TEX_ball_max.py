@@ -1,14 +1,9 @@
-# -------------------------------------------------
-# TEX_max_balls_freeflood_Hermite.py
-# Max count of 1.5" balls in free-flooding sections (Hermite + cosine hull form)
-# -------------------------------------------------
-
 import math
 from dataclasses import dataclass, field
 import numpy as np
 
 # ----------------------------
-# Hull geometry (Hermite front, cosine back)
+# Hull geometry
 # ----------------------------
 @dataclass
 class HullDims:
@@ -79,7 +74,7 @@ class Inputs:
     eta_packing: float = 0.60
     N_slices: int = 20000
     motor_bay_front_in: float = 40.0
-    motor_bay_back_in: float  = 88.0
+    motor_bay_back_in: float  = 90.0
     p: HullDims = field(default_factory=HullDims)
 
 # ----------------------------
@@ -118,7 +113,7 @@ def free_flood_volume_excluding_bay(inp: Inputs):
     # full hull interior
     V_total_ft3 = section_volume_interior_ft3(p, N=inp.N_slices)
 
-    # motor bay interior (sealed)
+    # motor compartment interior (sealed)
     R_in_ft = (p.R - p.t_wall_in) * in_to_ft
     A_in_ft2 = math.pi * R_in_ft**2
     L_bay_ft = max(0.0, inp.motor_bay_back_in - inp.motor_bay_front_in) * in_to_ft

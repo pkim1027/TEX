@@ -1,16 +1,10 @@
-# -------------------------------------------------
-# TEX Hull — Profile-Only Plotter
-# -------------------------------------------------
-# Draws the hull shape (front cone, cylinder, back cone)
-# -------------------------------------------------
-
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
 
 # ----------------------------
-# HULL GEOMETRY DEFINITIONS
+# Geometry
 # ----------------------------
 @dataclass(frozen=True)
 class HullDims:
@@ -77,7 +71,7 @@ def r_hull(x: float, p: HullDims) -> float:
     return 0.0
 
 # ----------------------------
-# PLOTTER
+# Plotter
 # ----------------------------
 def plot_hull_only():
     p = HullDims()
@@ -107,7 +101,7 @@ def plot_hull_only():
     plt.show()
 
 # ----------------------------
-# RUN
+# Output
 # ----------------------------
 if __name__ == "__main__":
     plot_hull_only()
