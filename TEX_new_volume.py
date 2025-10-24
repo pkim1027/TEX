@@ -1,14 +1,9 @@
 # -------------------------------------------------
-# TEX Hull — Exact-Profile Volume Integration
+# TEX Hull — Volume Integration
 # -------------------------------------------------
-# Volumes are integrated from the SAME hull profile used for plotting:
 # - Front: parabolic √(x/Lf) with C¹ Hermite smoothing to cylinder
 # - Cylinder: constant radius
 # - Back: cosine-blended taper to truncated tip
-#
-# Returns:
-#   TOTAL: V_out, V_in, V_wall (in³ and ft³)
-#   MOTOR BAY: V_out_bay, V_in_bay, V_wall_bay (in³ and ft³)
 # -------------------------------------------------
 
 import math
@@ -82,19 +77,14 @@ def r_hull(x: float, p: HullDims) -> float:
 # ----------------------------
 @dataclass
 class VolInputs:
-    # Outer geometry
     R_out_in: float = 12.0
     t_wall_in: float = 0.25
     L_front_in: float = 29.5
     L_cyl_in: float = 182.0
     L_back_in: float = 31.5
     r_tip_out_in: float = 3.5
-
-    # Motor bay placement from cylinder start (x = Lf)
     motor_bay_front_in: float = 40.0
-    motor_bay_back_in:  float = 90.0  # 90 - 40 = 50 in bay by default
-
-    # Integration resolution
+    motor_bay_back_in:  float = 90.0
     N_samples: int = 20000
 
 # ----------------------------
@@ -134,10 +124,14 @@ def compute_volumes_with_motor(inp: VolInputs):
     bay_b = p.Lf + max(0.0, min(inp.motor_bay_back_in,  inp.L_cyl_in))
     if bay_b < bay_a:
         bay_a, bay_b = bay_b, bay_a
-
-    # Use proportionally scaled samples for bay slice
     n_bay = max(5, int(inp.N_samples * (bay_b - bay_a) / max(1e-9, Ltot)))
     V_out_bay_in3, V_in_bay_in3 = _integrate_interval(p, inp.t_wall_in, bay_a, bay_b, n_bay)
+
+    # Section-by-section integration
+    n_sec = inp.N_samples // 10
+    Vf_out, Vf_in = _integrate_interval(p, inp.t_wall_in, 0.0, p.x_front_end, n_sec)
+    Vc_out, Vc_in = _integrate_interval(p, inp.t_wall_in, p.x_front_end, p.x_cyl_end, n_sec)
+    Vb_out, Vb_in = _integrate_interval(p, inp.t_wall_in, p.x_cyl_end, p.x_back_end, n_sec)
 
     in3_to_ft3 = 1.0 / 1728.0
 
@@ -160,6 +154,11 @@ def compute_volumes_with_motor(inp: VolInputs):
         "V_in_bay_ft3":  V_in_bay_in3  * in3_to_ft3,
         "V_wall_bay_ft3": (V_out_bay_in3 - V_in_bay_in3) * in3_to_ft3,
 
+        # Section volumes
+        "Vf_out_ft3": Vf_out * in3_to_ft3, "Vf_in_ft3": Vf_in * in3_to_ft3,
+        "Vc_out_ft3": Vc_out * in3_to_ft3, "Vc_in_ft3": Vc_in * in3_to_ft3,
+        "Vb_out_ft3": Vb_out * in3_to_ft3, "Vb_in_ft3": Vb_in * in3_to_ft3,
+
         # Bay placement (absolute)
         "x_bay_front_in": bay_a,
         "x_bay_back_in":  bay_b,
@@ -178,10 +177,16 @@ def print_volumes_with_motor(r: dict):
     print(f"Outer  V_out : {_fmt(r['V_out_in3'])} in³ = {_fmt(r['V_out_ft3'],4)} ft³")
     print(f"Inner  V_in  : {_fmt(r['V_in_in3'])} in³ = {_fmt(r['V_in_ft3'],4)} ft³")
     print(f"Material V_w : {_fmt(r['V_wall_in3'])} in³ = {_fmt(r['V_wall_ft3'],4)} ft³")
+
     print("\n-- MOTOR SECTION --")
     print(f"Outer  V_out : {_fmt(r['V_out_bay_in3'])} in³ = {_fmt(r['V_out_bay_ft3'],4)} ft³")
     print(f"Inner  V_in  : {_fmt(r['V_in_bay_in3'])} in³ = {_fmt(r['V_in_bay_ft3'],4)} ft³")
     print(f"Material V_w : {_fmt(r['V_wall_bay_in3'])} in³ = {_fmt(r['V_wall_bay_ft3'],4)} ft³")
+
+    print("\n-- BY SECTION (ft³) --")
+    print(f"Front cone : outer {_fmt(r['Vf_out_ft3'],4)} / inner {_fmt(r['Vf_in_ft3'],4)}")
+    print(f"Cylinder   : outer {_fmt(r['Vc_out_ft3'],4)} / inner {_fmt(r['Vc_in_ft3'],4)}")
+    print(f"Back cone  : outer {_fmt(r['Vb_out_ft3'],4)} / inner {_fmt(r['Vb_in_ft3'],4)}")
 
 # ----------------------------
 # Example run

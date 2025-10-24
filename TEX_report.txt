@@ -1,5 +1,7 @@
 === SECTION 1: VOLUME CALCULATIONS ===
 
+=== TEX Hull Volumes ===
+
 -- TOTAL HULL --
 Outer  V_out : 99793.174823 in³ = 57.7507 ft³
 Inner  V_in  : 95537.950382 in³ = 55.2882 ft³
@@ -9,6 +11,11 @@ Material V_w : 4255.224441 in³ = 2.4625 ft³
 Outer  V_out : 22619.467106 in³ = 13.0900 ft³
 Inner  V_in  : 21686.806787 in³ = 12.5502 ft³
 Material V_w : 932.660319 in³ = 0.5397 ft³
+
+-- BY SECTION (ft³) --
+Front cone : outer 4.5980 / inner 4.3673
+Cylinder   : outer 47.6475 / inner 45.6829
+Back cone  : outer 5.5052 / inner 5.2380
 
 
 === SECTIONS 2-4 IS WITHOUT CONSIDERING FREE-FLOODNG ===

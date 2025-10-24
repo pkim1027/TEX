@@ -339,7 +339,6 @@ if __name__ == "__main__":
     cg.add_point("Motor",    W_lbf=145.0,  x_in=p.Lf + 103.5,  z_in= 24.0)
     cg.add_point("Conning Tower",  W_lbf=40.0,  x_in=p.Lf + 103.5,  z_in=42.0)
     cg.add_point("Electronics", W_lbf=20.0, x_in=p.Lf + 103.5, z_in=85.5)
-    cg.add_point("Electronics", W_lbf=375, x_in=p.Lf + 95.5, z_in=-18)
 
     # (3) Compute & print CG
     cg.print_breakdown()
