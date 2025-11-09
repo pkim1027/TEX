@@ -3,12 +3,12 @@ import sympy as sp
 # ----------------------------
 # Geometry
 # ----------------------------
-R_out = 12                       # outer radius [in]
-t_wall = sp.Rational(1, 4)       # wall thickness [in]
-R_in = R_out - t_wall            # inner radius [in]
+R_out = 12												# outer radius [in]
+t_wall = 0.25											# wall thickness [in]
+R_in = R_out - t_wall							# inner radius [in]
 
-lf = 29.5                        # front cone length [in]
-lb = 31.5                        # back cone nominal length [in]
+lf = 29.5													# front cone length [in]
+lb = 31.5													# back cone nominal length [in]
 lb_to_cylin = 7
 lf_to_cylin = 5
 # Use total ≈ 243 in -> straight tube length:
