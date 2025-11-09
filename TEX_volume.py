@@ -12,7 +12,7 @@ lb = 31.5													# back cone nominal length [in]
 
 # Use total ≈ 243 in -> straight tube length:
 L_total = 243
-L = sp.Rational(L_total, 1) - (sp.Rational(lf,1) + sp.Rational(lb,1))  # => 182 in
+L = L_total - lf + lb  # => 182 in
 
 r_tip_out = 3.5                  # back cone cut radius (outer) [in]
 r_tip_in  = r_tip_out - t_wall   # inner cut radius (no Max; = 3.25 in)
