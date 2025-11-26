@@ -22,7 +22,7 @@ def seg_centroid_below_WL_in(d_in: float, R_in: float) -> float:
     if d_in <= 0:
         return 0.0
     if d_in >= 2.0 * R_in:
-        return 4.0 * R_in / 3.0
+        return R_in
     theta = seg_theta(d_in, R_in)
     denom = (theta - math.sin(theta))
     if abs(denom) < 1e-14:
