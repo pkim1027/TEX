@@ -329,8 +329,8 @@ def plot_hull_with_cb(inp: Inputs, r_cb: dict, title="TEX Hull Profile"):
     ax.set_ylim(-(p.R + margin), +(p.R + margin))
     ax.set_aspect('equal', 'box')
 
-    plt.xlabel('x [in] (nose → stern)', labelpad=15)
-    plt.ylabel('r [in]')
+    plt.xlabel('x [inch] (nose → stern)', labelpad=15)
+    plt.ylabel('r [inch]')
     plt.title(title)
     plt.legend(loc='upper center', bbox_to_anchor=(0.75, -0.35), ncol=1, frameon=True)
     plt.tight_layout()

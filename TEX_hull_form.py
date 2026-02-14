@@ -94,8 +94,8 @@ def plot_hull_only():
 
     ax = plt.gca()
     ax.set_aspect('equal', 'box')
-    ax.set_xlabel("x [in] (nose → stern)", labelpad=20)
-    ax.set_ylabel("r [in]")
+    ax.set_xlabel("x [inch] (nose to stern)", labelpad=20)
+    ax.set_ylabel("r [inch]")
     plt.title("TEX Hull Shape")
     plt.tight_layout()
     plt.show()
