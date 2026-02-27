@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 from TEX_new_volume import HullDims, r_hull
 
 # ------------------------------------------------------------
@@ -158,7 +159,7 @@ def _solve_h_for_volume(p, theta, V_target, x, h_lo=None, h_hi=None, it=80):
             a = m
     return 0.5 * (a + b)
 
-def compute_KN_KGsin_GZ_curve(
+def compute_GZ_curve(
     p,
     V_disp_in3,
     KG_in,
@@ -166,7 +167,7 @@ def compute_KN_KGsin_GZ_curve(
     Nx=2500
 ):
     """
-    Returns arrays: theta_deg, KN, KGsin, GZ, plus B_y, B_z for debugging.
+    Returns arrays: theta_deg, GZ, By, Bz, KGsin
     Units: inches (consistent with your geometry).
     """
     x = np.linspace(0.0, p.x_back_end, Nx)
@@ -174,46 +175,33 @@ def compute_KN_KGsin_GZ_curve(
     theta_deg = np.array(thetas_deg, dtype=float)
     theta_rad = np.deg2rad(theta_deg)
 
-    KN   = np.zeros_like(theta_rad)
-    KGsn = np.zeros_like(theta_rad)
     GZ   = np.zeros_like(theta_rad)
     By   = np.zeros_like(theta_rad)
     Bz   = np.zeros_like(theta_rad)
+    KGsn = np.zeros_like(theta_rad)
 
     for i, th in enumerate(theta_rad):
         # solve for h to hold displaced volume constant
         h = _solve_h_for_volume(p, th, V_disp_in3, x)
 
         V, (yB, zB) = _heel_volume_and_B(p, th, h, x)
-        # (V should be ~V_disp_in3)
         By[i], Bz[i] = yB, zB
 
-        c = math.cos(th)
-        s = math.sin(th)
+        KGsn[i] = KG_in * math.sin(th)
+        GZ[i]   = yB - KGsn[i]
 
-        # KN and KG*sin(theta)
-        KN[i]   = yB * c + zB * s
-        KGsn[i] = KG_in * s
+    return theta_deg, GZ, By, Bz, KGsn
 
-        # GZ = KN - KG*sin(theta)
-        GZ[i]   = KN[i] - KGsn[i]
 
-    return theta_deg, KN, KGsn, GZ, By, Bz
-
-# ------------------------------------------------------------
-# Example usage
-# ------------------------------------------------------------
 if __name__ == "__main__":
     # your hull params (outer)
     p = HullDims(R=12.0, Lf=29.5, Lc=182.0, Lb=31.5, r_tip=3.5)
 
-    # You must provide displacement volume (outer displaced volume) and KG.
-    # Example: if you already computed displaced volume in ft^3, convert:
-    # V_disp_in3 = V_disp_ft3 * 1728
-    V_disp_in3 = 18.28 * 1728  # <-- example (replace with YOUR displaced volume)
-    KG_in = 1.0 * 12.0         # <-- example: KG=1 ft -> 12 in (replace with YOUR KG)
+    # Provide displacement volume and KG (both in inches units system)
+    V_disp_in3 = 18.28 * 1728   # example: ft^3 -> in^3
+    KG_in      = 1.0 * 12.0     # example: ft -> in
 
-    th_deg, KN, KGsn, GZ, By, Bz = compute_KN_KGsin_GZ_curve(
+    th_deg, GZ, By, Bz, KGsn = compute_GZ_curve(
         p,
         V_disp_in3=V_disp_in3,
         KG_in=KG_in,
@@ -222,6 +210,18 @@ if __name__ == "__main__":
     )
 
     # print a few rows
-    print("theta(deg)    KN(in)    KG*sin(in)    GZ(in)")
+    print("theta(deg)    By(in)   KG*sin(in)    GZ(in)")
     for k in range(0, len(th_deg), 10):
-        print(f"{th_deg[k]:8.1f}  {KN[k]:8.3f}    {KGsn[k]:10.3f}   {GZ[k]:8.3f}")
+        print(f"{th_deg[k]:8.1f}  {By[k]:8.3f}   {KGsn[k]:10.3f}   {GZ[k]:8.3f}")
+
+    # Plot GZ curve
+    plt.figure(figsize=(7.0, 4.5))
+    plt.plot(th_deg, GZ, linewidth=2, label="GZ = yB − KG·sinθ")
+    plt.axhline(0.0, linewidth=1)
+    plt.xlabel("Heel angle θ (deg)")
+    plt.ylabel("Righting arm GZ (in)")
+    plt.title("GZ Curve")
+    plt.grid(True, which="both", linestyle="--", alpha=0.4)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
