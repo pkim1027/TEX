@@ -376,5 +376,4 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool =
 # Output
 # ----------------------------
 if __name__ == "__main__":
-    draw_cb(draft_in=12)
-    draw_cb(submerged=True)
+    draw_cb(draft_in=14)
