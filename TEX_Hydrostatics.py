@@ -292,8 +292,8 @@ if __name__ == "__main__":
     # ---- Weight table ----
     items = [
         Item("LIGHTSHIP", 425.00,  1.000,  0.000, 0.0, "CTR"),
-        Item("WEIGHTED KEEL (FWD)", 250.00, -2.000,  7.000, 0.0, "CTR"),
-        Item("WEIGHTED KEEL (AFT)", 250.00, -2.000, -7.000, 0.0, "CTR"),
+        Item("WEIGHTED KEEL (FWD)", 500.00, -2.000,  0, 0.0, "CTR"),
+        #Item("WEIGHTED KEEL (AFT)", 250.00, -2.000, -7.000, 0.0, "CTR"),
         Item("MOTOR", 145.00,  1.500, -1.080, 0.0, "CTR"),
         Item("CONNING TOWER", 40.00,  3.500, -1.080, 0.0, "CTR"),
         Item("ELECTRONICS", 10.00,  7.125, -1.080, 0.0, "PORT"),
