@@ -163,63 +163,75 @@ def compute_GZ_curve(
     p,
     V_disp_in3,
     KG_in,
-    thetas_deg=np.linspace(0.0, 60.0, 61),
+    thetas_deg=np.linspace(0.0, 110, 111),
     Nx=2500
 ):
     """
-    Returns arrays: theta_deg, GZ, By, Bz, KGsin
-    Units: inches (consistent with your geometry).
+    Returns arrays: theta_deg, GZ, By, Bz
+    Units: inches.
+    NOTE: KG_in must use the same vertical datum as zB (your solver's z=0).
     """
     x = np.linspace(0.0, p.x_back_end, Nx)
 
     theta_deg = np.array(thetas_deg, dtype=float)
     theta_rad = np.deg2rad(theta_deg)
 
-    GZ   = np.zeros_like(theta_rad)
-    By   = np.zeros_like(theta_rad)
-    Bz   = np.zeros_like(theta_rad)
-    KGsn = np.zeros_like(theta_rad)
+    GZ = np.zeros_like(theta_rad)
+    By = np.zeros_like(theta_rad)
+    Bz = np.zeros_like(theta_rad)
 
     for i, th in enumerate(theta_rad):
-        # solve for h to hold displaced volume constant
         h = _solve_h_for_volume(p, th, V_disp_in3, x)
-
         V, (yB, zB) = _heel_volume_and_B(p, th, h, x)
+
         By[i], Bz[i] = yB, zB
 
-        KGsn[i] = KG_in * math.sin(th)
-        GZ[i]   = yB - KGsn[i]
+        c = math.cos(th)
+        s = math.sin(th)
 
-    return theta_deg, GZ, By, Bz, KGsn
+        GZ[i] = yB * c + (zB - KG_in) * s
+
+    return theta_deg, GZ, By, Bz
 
 
 if __name__ == "__main__":
-    # your hull params (outer)
     p = HullDims(R=12.0, Lf=29.5, Lc=182.0, Lb=31.5, r_tip=3.5)
 
-    # Provide displacement volume and KG (both in inches units system)
-    V_disp_in3 = 18.28 * 1728   # example: ft^3 -> in^3
-    KG_in      = 1.0 * 12.0     # example: ft -> in
+    V_disp_in3 = 29.909221 * 1728.0
+    KG_in      = -0.016977 * 12.0
 
-    th_deg, GZ, By, Bz, KGsn = compute_GZ_curve(
+    th_deg, GZ, By, Bz = compute_GZ_curve(
         p,
         V_disp_in3=V_disp_in3,
         KG_in=KG_in,
-        thetas_deg=np.linspace(0, 70, 71),
+        thetas_deg=np.linspace(0, 110, 111),
         Nx=2500
     )
 
-    # print a few rows
-    print("theta(deg)    By(in)   KG*sin(in)    GZ(in)")
-    for k in range(0, len(th_deg), 10):
-        print(f"{th_deg[k]:8.1f}  {By[k]:8.3f}   {KGsn[k]:10.3f}   {GZ[k]:8.3f}")
+    avs = None
+    for i in range(1, len(GZ)):
+        if GZ[i-1] > 0 and GZ[i] <= 0:
+            th0, th1 = th_deg[i-1], th_deg[i]
+            gz0, gz1 = GZ[i-1], GZ[i]
+            avs = th0 + (0 - gz0) * (th1 - th0) / (gz1 - gz0)
+            break
 
-    # Plot GZ curve
+    if avs is None:
+        print("No AVS found up to 110°.")
+    else:
+        print(f"AVS (GZ=0) ≈ {avs:.2f} deg")
+
+    # Plot
     plt.figure(figsize=(7.0, 4.5))
-    plt.plot(th_deg, GZ, linewidth=2, label="GZ = yB − KG·sinθ")
+    plt.plot(th_deg, GZ, linewidth=2,
+             label=r"$GZ = y_B\cos\theta + (z_B-KG)\sin\theta$")
     plt.axhline(0.0, linewidth=1)
-    plt.xlabel("Heel angle θ (deg)")
-    plt.ylabel("Righting arm GZ (in)")
+    if avs is not None:
+        plt.axvline(avs, linestyle="--", linewidth=1)
+        plt.text(avs + 1, 0.05, f"AVS ≈ {avs:.1f}°")
+
+    plt.xlabel("Heel Angle θ (deg.)")
+    plt.ylabel("Righting Arm GZ (in.)")
     plt.title("GZ Curve")
     plt.grid(True, which="both", linestyle="--", alpha=0.4)
     plt.legend()
