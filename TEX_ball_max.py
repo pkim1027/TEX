@@ -90,7 +90,7 @@ def section_volume_interior_ft3(p: HullDims, N: int = 20000):
     r_out = np.array([r_hull(xi, p) for xi in x])
     r_in = np.clip(r_out - p.t_wall_in, 0.0, None)
     dx = (p.x_back_end - 0.0) / (N - 1)
-    V_in3 = np.trapz(math.pi * r_in**2, dx=dx)
+    V_in3 = np.trapezoid(math.pi * r_in**2, dx=dx)
     return V_in3 / 1728.0  # ft^3
 
 def cylinder_interior_volume_excluding_bay(p: HullDims, mb_front: float, mb_back: float):

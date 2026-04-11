@@ -7,7 +7,7 @@ from dataclasses import dataclass
 @dataclass
 class Inputs:
     # Hydro target
-    W_total_lbf: float = 1000      # total vessel weight (lbf)
+    W_total_lbf: float = 1250      # total vessel weight (lbf)
     draft_in: float = 12.0            # target outside draft at motor bay (inches from outside bottom)
     gamma: float = 62.4               # lbf/ft^3 (fresh water)
 

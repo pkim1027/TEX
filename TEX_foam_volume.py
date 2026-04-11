@@ -47,7 +47,7 @@ def print_report(result: dict, target_lbf: float):
 # Output
 # -------------------------------------------
 if __name__ == "__main__":
-    target_lift = 600  # desired net buoyant lift (lbf)
+    target_lift = 700  # desired net buoyant lift (lbf)
 
     foams = [
         Foam("R3312", 12),

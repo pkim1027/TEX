@@ -367,10 +367,10 @@ def draw_cb(draft_in: float = None, W_total_lbf: float = None, submerged: bool =
              "TEX — CB @ Waterline Given Weight" if inp.solve_equilibrium
              else "TEX — CB @ Given Draft")
 
-    plot_hull_with_cb(inp, r, title=title)
     print_block(inp, r, title=("CB @ Fully Submerged" if inp.submerged
                                else "CB @ Solved Draft" if inp.solve_equilibrium
                                else "CB @ Given Draft"))
+    plot_hull_with_cb(inp, r, title=title)
 
 # ----------------------------
 # Output
